@@ -1,7 +1,7 @@
 {
-  "name": "petdesh-backend",
+  "name": "stackit-backend",
   "version": "1.0.0",
-  "description": "Backend for Petdesh application",
+  "description": "Backend for StackIt Q&A Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
