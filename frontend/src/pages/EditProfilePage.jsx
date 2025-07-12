@@ -199,7 +199,7 @@ const EditProfile = () => {
         <div className="form-actions">
           <button
             type="button"
-            className="btn btn-outline"
+            className="btn btn-secondary"
             onClick={() => navigate('/profile')}
           >
             Cancel

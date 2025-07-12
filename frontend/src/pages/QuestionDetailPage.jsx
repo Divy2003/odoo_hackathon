@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchQuestion, fetchAnswers, voteOnContent } from '../redux/slices/questionsSlice';
+import { incrementView } from '../services/questionsAPI';
 import { FaArrowUp, FaArrowDown, FaEye, FaCheck, FaEdit, FaTrash } from 'react-icons/fa';
 import AnswerForm from '../components/questions/AnswerForm';
 import AnswerList from '../components/questions/AnswerList';
@@ -21,6 +22,8 @@ const QuestionDetail = () => {
     if (id) {
       dispatch(fetchQuestion(id));
       dispatch(fetchAnswers({ questionId: id }));
+      // Increment view count only once per visit
+      incrementView(id).catch(() => {});
     }
   }, [dispatch, id]);
 

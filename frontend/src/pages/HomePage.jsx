@@ -75,7 +75,7 @@ const Home = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
-          <button type="submit" className="btn btn-outline">
+          <button type="submit" className="btn btn-primary">
             Search
           </button>
         </form>

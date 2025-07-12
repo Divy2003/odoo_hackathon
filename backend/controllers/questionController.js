@@ -68,7 +68,7 @@ exports.getQuestions = async (req, res) => {
   }
 };
 
-// Get single question by ID
+// Get single question by ID (no view increment)
 exports.getQuestionById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -89,11 +89,23 @@ exports.getQuestionById = async (req, res) => {
       return res.status(404).json({ message: 'Question not found' });
     }
 
-    // Increment view count
+    res.json(question);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Increment question view count only
+exports.incrementQuestionView = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const question = await Question.findById(id);
+    if (!question || !question.isActive) {
+      return res.status(404).json({ message: 'Question not found' });
+    }
     question.views += 1;
     await question.save();
-
-    res.json(question);
+    res.json({ views: question.views });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
