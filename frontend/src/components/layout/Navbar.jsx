@@ -1,7 +1,9 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../../redux/slices/authSlice';
-import { FaBell, FaUser, FaSignOutAlt, FaPlus } from 'react-icons/fa';
+import { FaUser, FaSignOutAlt, FaPlus } from 'react-icons/fa';
+import NotificationDropdown from '../notifications/NotificationDropdown';
+import Avatar from '../common/Avatar';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -12,6 +14,8 @@ const Navbar = () => {
     dispatch(logout());
     navigate('/');
   };
+
+
 
   return (
     <nav className="navbar">
@@ -35,14 +39,15 @@ const Navbar = () => {
               </Link>
               
               <div className="nav-user-menu">
-                <button className="notification-btn">
-                  <FaBell />
-                  <span className="notification-badge">3</span>
-                </button>
+                <NotificationDropdown />
                 
                 <div className="user-dropdown">
                   <button className="user-btn">
-                    <FaUser />
+                    <Avatar
+                      src={user?.avatar}
+                      name={user?.name || 'User'}
+                      size="small"
+                    />
                     <span>{user?.name}</span>
                   </button>
                   

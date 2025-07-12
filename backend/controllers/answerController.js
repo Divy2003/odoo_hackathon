@@ -25,18 +25,11 @@ exports.getAnswersByQuestion = async (req, res) => {
       sortOrder = { createdAt: 1 };
     }
 
-    const answers = await Answer.find({ 
-      question: questionId, 
-      isActive: true 
+    const answers = await Answer.find({
+      question: questionId,
+      isActive: true
     })
       .populate('author', 'name email reputation avatar')
-      .populate({
-        path: 'comments',
-        populate: {
-          path: 'author',
-          select: 'name email reputation avatar'
-        }
-      })
       .sort(sortOrder)
       .skip(skip)
       .limit(parseInt(limit));

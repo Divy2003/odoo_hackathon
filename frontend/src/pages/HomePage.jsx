@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { fetchQuestions, setFilters } from '../../redux/slices/questionsSlice';
+import { fetchQuestions, setFilters } from '../redux/slices/questionsSlice';
 import { FaEye, FaArrowUp, FaArrowDown, FaCheck } from 'react-icons/fa';
 
 const Home = () => {

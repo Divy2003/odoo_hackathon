@@ -5,10 +5,17 @@ import './styles/App.css'
 
 // Components
 import Navbar from './components/layout/Navbar'
-import Home from './components/questions/Home'
-import Login from './components/auth/Login'
-import Signup from './components/auth/Signup'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+
+// Pages
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/SignupPage'
+import AskQuestionPage from './pages/AskQuestionPage'
+import QuestionDetailPage from './pages/QuestionDetailPage'
+import TagsPage from './pages/TagsPage'
+import ProfilePage from './pages/ProfilePage'
+import EditProfilePage from './pages/EditProfilePage'
 
 function App() {
   return (
@@ -18,16 +25,18 @@ function App() {
           <Navbar />
           <main className="main-content">
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/tags" element={<TagsPage />} />
+              <Route path="/questions/:id" element={<QuestionDetailPage />} />
 
               {/* Protected Routes */}
               <Route
                 path="/ask"
                 element={
                   <ProtectedRoute>
-                    <div>Ask Question Page (Coming Soon)</div>
+                    <AskQuestionPage />
                   </ProtectedRoute>
                 }
               />
@@ -35,7 +44,15 @@ function App() {
                 path="/profile"
                 element={
                   <ProtectedRoute>
-                    <div>Profile Page (Coming Soon)</div>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile/edit"
+                element={
+                  <ProtectedRoute>
+                    <EditProfilePage />
                   </ProtectedRoute>
                 }
               />
