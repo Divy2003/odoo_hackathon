@@ -5,6 +5,8 @@ import { fetchQuestion, fetchAnswers, voteOnContent } from '../redux/slices/ques
 import { FaArrowUp, FaArrowDown, FaEye, FaCheck, FaEdit, FaTrash } from 'react-icons/fa';
 import AnswerForm from '../components/questions/AnswerForm';
 import AnswerList from '../components/questions/AnswerList';
+import MarkdownRenderer from '../components/common/MarkdownRenderer';
+import Avatar from '../components/common/Avatar';
 
 const QuestionDetail = () => {
   const { id } = useParams();
@@ -100,9 +102,9 @@ const QuestionDetail = () => {
           </div>
 
           <div className="question-main-content">
-            <div 
+            <MarkdownRenderer
+              content={currentQuestion.description}
               className="question-body"
-              dangerouslySetInnerHTML={{ __html: currentQuestion.description }}
             />
 
             <div className="question-tags">

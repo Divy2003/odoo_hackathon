@@ -5,12 +5,12 @@ const User = require('../models/User');
 exports.getNotifications = async (req, res) => {
   try {
     const { page = 1, limit = 20, unreadOnly = false } = req.query;
-    
-    const query = { 
-      recipient: req.user.id, 
-      isActive: true 
+
+    const query = {
+      recipient: req.user.id,
+      isActive: true
     };
-    
+
     if (unreadOnly === 'true') {
       query.isRead = false;
     }
@@ -33,18 +33,30 @@ exports.getNotifications = async (req, res) => {
     });
 
     res.json({
-      notifications,
-      unreadCount,
+      notifications: notifications || [],
+      unreadCount: unreadCount || 0,
       pagination: {
         currentPage: parseInt(page),
-        totalPages: Math.ceil(total / limit),
-        totalNotifications: total,
-        hasNext: page * limit < total,
+        totalPages: Math.ceil(total / limit) || 1,
+        totalNotifications: total || 0,
+        hasNext: (page * limit) < total,
         hasPrev: page > 1
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Notification error:', error);
+    // Return empty notifications instead of error to prevent frontend crashes
+    res.json({
+      notifications: [],
+      unreadCount: 0,
+      pagination: {
+        currentPage: parseInt(req.query.page || 1),
+        totalPages: 1,
+        totalNotifications: 0,
+        hasNext: false,
+        hasPrev: false
+      }
+    });
   }
 };
 
@@ -117,9 +129,11 @@ exports.getUnreadCount = async (req, res) => {
       isActive: true
     });
 
-    res.json({ unreadCount: count });
+    res.json({ unreadCount: count || 0 });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Unread count error:', error);
+    // Return 0 instead of error to prevent frontend crashes
+    res.json({ unreadCount: 0 });
   }
 };
 

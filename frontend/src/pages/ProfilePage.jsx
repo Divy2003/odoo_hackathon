@@ -20,8 +20,13 @@ const Profile = () => {
 
   useEffect(() => {
     dispatch(getProfile());
-    fetchUserStats();
   }, [dispatch]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchUserStats();
+    }
+  }, [user?.id]);
 
   const fetchUserStats = async () => {
     if (!user?.id) return;
@@ -30,12 +35,14 @@ const Profile = () => {
     try {
       // Fetch user's questions
       const questionsResponse = await questionsAPI.getQuestions({
-        author: user.id,
+        author: user._id,
         limit: 5
       });
+      console.log("questionsResponse-",questionsResponse);
       
       // Fetch user's votes
       const votesResponse = await votesAPI.getUserVotes({ limit: 5 });
+      console.log("votesResponse-",votesResponse);
       
       setUserStats({
         questionsCount: questionsResponse.data.pagination.totalQuestions,

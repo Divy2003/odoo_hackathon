@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchQuestions, setFilters } from '../redux/slices/questionsSlice';
 import { FaEye, FaArrowUp, FaArrowDown, FaCheck } from 'react-icons/fa';
+import MarkdownRenderer from '../components/common/MarkdownRenderer';
+import Avatar from '../components/common/Avatar';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -142,9 +144,11 @@ const Home = () => {
                 </h3>
                 
                 <div className="question-excerpt">
-                  {question.description.length > 200
-                    ? `${question.description.substring(0, 200)}...`
-                    : question.description}
+                  <MarkdownRenderer
+                    content={question.description.length > 200
+                      ? `${question.description.substring(0, 200)}...`
+                      : question.description}
+                  />
                 </div>
 
                 <div className="question-tags">

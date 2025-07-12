@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { voteOnContent } from '../../redux/slices/questionsSlice';
 import { answersAPI } from '../../services/api';
 import { FaArrowUp, FaArrowDown, FaCheck, FaEdit, FaTrash } from 'react-icons/fa';
+import MarkdownRenderer from '../common/MarkdownRenderer';
+import Avatar from '../common/Avatar';
 
 const AnswerList = ({ answers, questionId, questionAuthorId }) => {
   const dispatch = useDispatch();
@@ -119,9 +121,9 @@ const AnswerList = ({ answers, questionId, questionAuthorId }) => {
               </div>
             )}
             
-            <div 
+            <MarkdownRenderer
+              content={answer.content}
               className="answer-body"
-              dangerouslySetInnerHTML={{ __html: answer.content }}
             />
 
             <div className="answer-footer">
