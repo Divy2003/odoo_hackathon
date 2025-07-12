@@ -151,6 +151,14 @@ const Home = () => {
                   />
                 </div>
 
+                {question.image && (
+                  <div className="question-image">
+                    <img src={question.image} alt="Question illustration" />
+                  </div>
+                )}
+                {/* Debug: Show if image exists */}
+                {question.image && console.log("Question has image:", question._id, question.image.substring(0, 50))}
+
                 <div className="question-tags">
                   {question.tags?.map((tag) => (
                     <Link

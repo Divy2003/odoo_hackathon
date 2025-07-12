@@ -114,7 +114,7 @@ exports.incrementQuestionView = async (req, res) => {
 // Create new question
 exports.createQuestion = async (req, res) => {
   try {
-    const { title, description, tags } = req.body;
+    const { title, description, tags, image } = req.body;
     
     if (!title || !description) {
       return res.status(400).json({ message: 'Title and description are required' });
@@ -142,7 +142,8 @@ exports.createQuestion = async (req, res) => {
       title: title.trim(),
       description,
       author: req.user.id,
-      tags: tagIds
+      tags: tagIds,
+      image: image || null
     });
 
     await question.save();
@@ -164,7 +165,7 @@ exports.createQuestion = async (req, res) => {
 exports.updateQuestion = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, tags } = req.body;
+    const { title, description, tags, image } = req.body;
     
     const question = await Question.findById(id);
     if (!question || !question.isActive) {
@@ -179,6 +180,7 @@ exports.updateQuestion = async (req, res) => {
     // Update fields
     if (title) question.title = title.trim();
     if (description) question.description = description;
+    if (image !== undefined) question.image = image;
     
     // Update tags if provided
     if (tags) {

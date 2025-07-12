@@ -7,14 +7,18 @@ const questionSchema = new mongoose.Schema({
     trim: true,
     maxlength: 200
   },
-  description: { 
-    type: String, 
-    required: true 
+  description: {
+    type: String,
+    required: true
   },
-  author: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
+  image: {
+    type: String, // URL or base64 string for the image
+    default: null
+  },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
   tags: [{ 
     type: mongoose.Schema.Types.ObjectId, 

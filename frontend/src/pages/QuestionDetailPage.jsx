@@ -110,6 +110,12 @@ const QuestionDetail = () => {
               className="question-body"
             />
 
+            {currentQuestion.image && (
+              <div className="question-image-detail">
+                <img src={currentQuestion.image} alt="Question illustration" />
+              </div>
+            )}
+
             <div className="question-tags">
               {currentQuestion.tags?.map((tag) => (
                 <Link

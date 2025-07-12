@@ -9,7 +9,8 @@ const EditQuestion = ({ questionId, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    tags: []
+    tags: [],
+    image: null
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -26,7 +27,8 @@ const EditQuestion = ({ questionId, onClose, onUpdate }) => {
       setFormData({
         title: question.title,
         description: question.description,
-        tags: question.tags || []
+        tags: question.tags || [],
+        image: question.image || null
       });
     } catch (error) {
       console.error('Error fetching question:', error);
@@ -90,6 +92,31 @@ const EditQuestion = ({ questionId, onClose, onUpdate }) => {
     }
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors({ ...errors, image: 'Image size must be less than 5MB' });
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        setErrors({ ...errors, image: 'Please select a valid image file' });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        handleChange('image', e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    handleChange('image', null);
+  };
+
   if (initialLoading) {
     return <div className="loading">Loading question...</div>;
   }
@@ -131,6 +158,43 @@ const EditQuestion = ({ questionId, onClose, onUpdate }) => {
               placeholder="Provide all the details someone would need to answer your question..."
             />
             {errors.description && <span className="error-text">{errors.description}</span>}
+          </div>
+
+          <div className="form-group">
+            <label>Image (Optional)</label>
+            <div className="image-upload-container">
+              {!formData.image ? (
+                <div className="image-upload-area">
+                  <input
+                    type="file"
+                    id="image-upload-edit"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    style={{ display: 'none' }}
+                  />
+                  <label htmlFor="image-upload-edit" className="image-upload-label">
+                    <div className="upload-icon">📷</div>
+                    <div className="upload-text">
+                      <span>Click to upload an image</span>
+                      <small>PNG, JPG, GIF up to 5MB</small>
+                    </div>
+                  </label>
+                </div>
+              ) : (
+                <div className="image-preview">
+                  <img src={formData.image} alt="Question preview" />
+                  <button
+                    type="button"
+                    className="remove-image-btn"
+                    onClick={removeImage}
+                    title="Remove image"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
+            {errors.image && <span className="error-text">{errors.image}</span>}
           </div>
 
           <div className="form-group">

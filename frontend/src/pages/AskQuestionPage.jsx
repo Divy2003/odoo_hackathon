@@ -9,7 +9,8 @@ const AskQuestion = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    tags: []
+    tags: [],
+    image: null
   });
   const [errors, setErrors] = useState({});
 
@@ -46,11 +47,12 @@ const AskQuestion = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
+    console.log("Submitting form data:", formData);
     const result = await dispatch(createQuestion(formData));
     
     if (createQuestion.fulfilled.match(result)) {
@@ -77,6 +79,37 @@ const AskQuestion = () => {
     if (errors.tags) {
       setErrors({ ...errors, tags: '' });
     }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors({ ...errors, image: 'Image size must be less than 5MB' });
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        setErrors({ ...errors, image: 'Please select a valid image file' });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        console.log("Image loaded, size:", e.target.result.length);
+        setFormData({ ...formData, image: e.target.result });
+        if (errors.image) {
+          setErrors({ ...errors, image: '' });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData({ ...formData, image: null });
   };
 
   return (
@@ -124,6 +157,48 @@ const AskQuestion = () => {
             placeholder="Provide details about your question. Include what you've tried, what you expected to happen, and what actually happened."
           />
           {errors.description && <span className="error-text">{errors.description}</span>}
+        </div>
+
+        <div className="form-group">
+          <label>
+            Image (Optional)
+            <span className="form-help">
+              Add an image to help illustrate your question (max 5MB)
+            </span>
+          </label>
+          <div className="image-upload-container">
+            {!formData.image ? (
+              <div className="image-upload-area">
+                <input
+                  type="file"
+                  id="image-upload"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor="image-upload" className="image-upload-label">
+                  <div className="upload-icon">📷</div>
+                  <div className="upload-text">
+                    <span>Click to upload an image</span>
+                    <small>PNG, JPG, GIF up to 5MB</small>
+                  </div>
+                </label>
+              </div>
+            ) : (
+              <div className="image-preview">
+                <img src={formData.image} alt="Question preview" />
+                <button
+                  type="button"
+                  className="remove-image-btn"
+                  onClick={removeImage}
+                  title="Remove image"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+          </div>
+          {errors.image && <span className="error-text">{errors.image}</span>}
         </div>
 
         <div className="form-group">
