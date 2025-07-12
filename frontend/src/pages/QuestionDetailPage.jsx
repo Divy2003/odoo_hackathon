@@ -17,6 +17,7 @@ const QuestionDetail = () => {
   );
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const [userVote, setUserVote] = useState(null);
+  const [showOnlyAccepted, setShowOnlyAccepted] = useState(false);
 
   useEffect(() => {
     if (id) {

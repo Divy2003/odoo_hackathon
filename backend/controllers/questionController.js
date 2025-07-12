@@ -260,3 +260,27 @@ exports.deleteQuestion = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// Increment question view count
+exports.incrementView = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const question = await Question.findById(id);
+    if (!question) {
+      return res.status(404).json({ message: 'Question not found' });
+    }
+
+    // Increment view count
+    question.views = (question.views || 0) + 1;
+    await question.save();
+
+    res.json({
+      message: 'View count incremented',
+      views: question.views
+    });
+  } catch (error) {
+    console.error('Increment view error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

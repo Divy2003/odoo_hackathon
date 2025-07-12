@@ -5,6 +5,7 @@ import RichTextEditor from '../common/RichTextEditor';
 import TagInput from '../common/TagInput';
 
 const EditQuestion = ({ questionId, onClose, onUpdate }) => {
+  console.log("EditQuestion component rendered with questionId:", questionId);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',

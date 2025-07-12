@@ -19,11 +19,14 @@ const NotificationDropdown = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      console.log("Fetching unread count for authenticated user");
-      dispatch(fetchUnreadCount());
+      dispatch(fetchUnreadCount()).catch(err => {
+        console.error("Failed to fetch unread count:", err);
+      });
       // Set up polling for new notifications
       const interval = setInterval(() => {
-        dispatch(fetchUnreadCount());
+        dispatch(fetchUnreadCount()).catch(err => {
+          console.error("Failed to fetch unread count:", err);
+        });
       }, 30000); // Check every 30 seconds
       return () => clearInterval(interval);
     }
@@ -42,8 +45,9 @@ const NotificationDropdown = () => {
 
   const handleToggleDropdown = () => {
     if (!isOpen) {
-      console.log("Fetching notifications...");
-      dispatch(fetchNotifications({ limit: 10 }));
+      dispatch(fetchNotifications({ limit: 10 })).catch(err => {
+        console.error("Failed to fetch notifications:", err);
+      });
     }
     setIsOpen(!isOpen);
   };
@@ -113,10 +117,24 @@ const NotificationDropdown = () => {
               <div className="notification-error">{error}</div>
             )}
             {loading ? (
-              <div className="notification-loading">Loading...</div>
+              <div className="notification-loading">
+                <div className="loading-spinner">🔄</div>
+                <div>Loading notifications...</div>
+              </div>
             ) : notifications.length === 0 && !error ? (
               <div className="no-notifications">
-                <p>No notifications yet</p>
+                <div className="empty-icon">🔔</div>
+                <h4>No notifications yet</h4>
+                <p>When someone answers your questions or mentions you, you'll see notifications here.</p>
+                <div className="notification-tips">
+                  <h5>Get notifications when:</h5>
+                  <ul>
+                    <li>Someone answers your question</li>
+                    <li>Someone comments on your answer</li>
+                    <li>Someone mentions you with @username</li>
+                    <li>Your answer gets accepted</li>
+                  </ul>
+                </div>
               </div>
             ) : (
               notifications.map((notification) => (

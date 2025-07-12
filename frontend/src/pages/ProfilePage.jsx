@@ -246,7 +246,10 @@ const Profile = () => {
                         </h4>
                         <button
                           className="btn btn-sm btn-outline"
-                          onClick={() => setEditingQuestion(question)}
+                          onClick={() => {
+                            console.log("Edit question clicked:", question);
+                            setEditingQuestion(question);
+                          }}
                           title="Edit Question"
                         >
                           <FaEdit />

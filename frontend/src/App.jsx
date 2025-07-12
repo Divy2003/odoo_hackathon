@@ -16,6 +16,7 @@ import QuestionDetailPage from './pages/QuestionDetailPage'
 import TagsPage from './pages/TagsPage'
 import ProfilePage from './pages/ProfilePage'
 import EditProfilePage from './pages/EditProfilePage'
+import AdminDashboard from './pages/AdminDashboard'
 
 function App() {
   return (
@@ -62,7 +63,7 @@ function App() {
                 path="/admin"
                 element={
                   <ProtectedRoute adminOnly>
-                    <div>Admin Dashboard (Coming Soon)</div>
+                    <AdminDashboard />
                   </ProtectedRoute>
                 }
               />

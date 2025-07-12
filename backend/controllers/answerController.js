@@ -323,3 +323,97 @@ exports.getUserAnswers = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// Accept answer by question owner (new workflow)
+exports.acceptAnswerByOwner = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const answer = await Answer.findById(id).populate('question');
+    if (!answer || !answer.isActive) {
+      return res.status(404).json({ message: 'Answer not found' });
+    }
+
+    // Check if user is the question owner
+    if (answer.question.author.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Only question owner can accept answers' });
+    }
+
+    // Update answer status
+    answer.status = 'accepted';
+    answer.isAccepted = true;
+    answer.reviewedAt = new Date();
+    await answer.save();
+
+    // Create notification for answer author
+    if (answer.author.toString() !== req.user.id) {
+      const notification = new Notification({
+        recipient: answer.author,
+        sender: req.user.id,
+        type: 'answer_accepted',
+        title: 'Your Answer Was Accepted!',
+        message: 'Your answer has been accepted!',
+        relatedQuestion: answer.question._id,
+        relatedAnswer: answer._id
+      });
+      await notification.save();
+    }
+
+    res.json({
+      message: 'Answer accepted successfully',
+      answer: await Answer.findById(id).populate('author', 'name email reputation avatar')
+    });
+  } catch (error) {
+    console.error('Accept answer error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Reject answer by question owner
+exports.rejectAnswer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const answer = await Answer.findById(id).populate('question');
+    if (!answer || !answer.isActive) {
+      return res.status(404).json({ message: 'Answer not found' });
+    }
+
+    // Check if user is the question owner
+    if (answer.question.author.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Only question owner can reject answers' });
+    }
+
+    // Update answer status
+    answer.status = 'rejected';
+    answer.isAccepted = false;
+    answer.reviewedAt = new Date();
+    if (reason) {
+      answer.rejectionReason = reason;
+    }
+    await answer.save();
+
+    // Create notification for answer author
+    if (answer.author.toString() !== req.user.id) {
+      const notification = new Notification({
+        recipient: answer.author,
+        sender: req.user.id,
+        type: 'answer_rejected',
+        title: 'Your Answer Was Rejected',
+        message: reason ? `Your answer was rejected: ${reason}` : 'Your answer was rejected',
+        relatedQuestion: answer.question._id,
+        relatedAnswer: answer._id
+      });
+      await notification.save();
+    }
+
+    res.json({
+      message: 'Answer rejected successfully',
+      answer: await Answer.findById(id).populate('author', 'name email reputation avatar')
+    });
+  } catch (error) {
+    console.error('Reject answer error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

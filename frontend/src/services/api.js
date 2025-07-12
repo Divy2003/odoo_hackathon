@@ -61,6 +61,8 @@ export const answersAPI = {
   updateAnswer: (id, data) => api.put(`/answers/${id}`, data),
   deleteAnswer: (id) => api.delete(`/answers/${id}`),
   acceptAnswer: (id) => api.patch(`/answers/${id}/accept`),
+  acceptAnswerByOwner: (id) => api.patch(`/answers/${id}/accept-by-owner`),
+  rejectAnswer: (id, data) => api.patch(`/answers/${id}/reject`, data),
   getUserAnswers: (params) => api.get('/answers/user/me', { params }),
 };
 
@@ -91,6 +93,15 @@ export const notificationsAPI = {
   markAllAsRead: () => api.patch('/notifications/mark-all-read'),
   deleteNotification: (id) => api.delete(`/notifications/${id}`),
   getUnreadCount: () => api.get('/notifications/unread-count'),
+  sendBroadcast: (data) => api.post('/notifications/broadcast', data),
+};
+
+// Users API (Admin)
+export const usersAPI = {
+  getAllUsers: (params) => api.get('/users', { params }),
+  banUser: (id) => api.patch(`/users/${id}/ban`),
+  unbanUser: (id) => api.patch(`/users/${id}/unban`),
+  getUserStats: (id) => api.get(`/users/${id}/stats`),
 };
 
 // Admin API

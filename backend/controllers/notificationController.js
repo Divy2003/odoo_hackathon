@@ -3,9 +3,20 @@ const User = require('../models/User');
 
 // Get user's notifications
 exports.getNotifications = async (req, res) => {
-  console.log('DEBUG: req.user =', req.user);
-
   try {
+    if (!req.user || !req.user.id) {
+      return res.json({
+        notifications: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalNotifications: 0,
+          hasNext: false,
+          hasPrev: false
+        }
+      });
+    }
+
     const { page = 1, limit = 20, unreadOnly = false } = req.query;
 
     const query = {
@@ -125,6 +136,10 @@ exports.deleteNotification = async (req, res) => {
 // Get unread notification count
 exports.getUnreadCount = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.json({ unreadCount: 0 });
+    }
+
     const count = await Notification.countDocuments({
       recipient: req.user.id,
       isRead: false,

@@ -6,6 +6,8 @@ const {
   updateAnswer,
   deleteAnswer,
   acceptAnswer,
+  acceptAnswerByOwner,
+  rejectAnswer,
   getUserAnswers
 } = require('../controllers/answerController');
 const { auth } = require('../middlewares/auth');
@@ -19,5 +21,7 @@ router.post('/question/:questionId', auth, createAnswer);
 router.put('/:id', auth, updateAnswer);
 router.delete('/:id', auth, deleteAnswer);
 router.patch('/:id/accept', auth, acceptAnswer);
+router.patch('/:id/accept-by-owner', auth, acceptAnswerByOwner);
+router.patch('/:id/reject', auth, rejectAnswer);
 
 module.exports = router;

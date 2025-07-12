@@ -33,11 +33,24 @@ const AnswerList = ({ answers, questionId, questionAuthorId }) => {
 
   const handleAcceptAnswer = async (answerId) => {
     try {
-      await answersAPI.acceptAnswer(answerId);
+      await answersAPI.acceptAnswerByOwner(answerId);
       // Refresh the page or update state
       window.location.reload();
     } catch (error) {
       console.error('Error accepting answer:', error);
+      alert('Failed to accept answer');
+    }
+  };
+
+  const handleRejectAnswer = async (answerId) => {
+    const reason = prompt('Reason for rejection (optional):');
+    try {
+      await answersAPI.rejectAnswer(answerId, { reason });
+      // Refresh the page or update state
+      window.location.reload();
+    } catch (error) {
+      console.error('Error rejecting answer:', error);
+      alert('Failed to reject answer');
     }
   };
 
@@ -97,14 +110,17 @@ const AnswerList = ({ answers, questionId, questionAuthorId }) => {
               <FaArrowDown />
             </button>
             
-            {canAcceptAnswer && !answer.isAccepted && (
-              <button
-                className="accept-btn"
-                onClick={() => handleAcceptAnswer(answer._id)}
-                title="Accept this answer"
-              >
-                <FaCheck />
-              </button>
+            {canAcceptAnswer && answer.status !== 'accepted' && (
+              <div className="owner-actions">
+                <button
+                  className="accept-btn"
+                  onClick={() => handleAcceptAnswer(answer._id)}
+                  title="Accept this answer"
+                >
+                  <FaCheck /> Accept
+                </button>
+               
+              </div>
             )}
             
             {answer.isAccepted && (
@@ -115,6 +131,15 @@ const AnswerList = ({ answers, questionId, questionAuthorId }) => {
           </div>
 
           <div className="answer-content">
+            {/* Show status for question owner */}
+            {canAcceptAnswer && (
+              <div className={`answer-status ${answer.status || 'pending'}`}>
+                {answer.status === 'accepted' && '✓ Accepted'}
+                {answer.status === 'rejected' && '✗ Rejected'}
+                {(!answer.status || answer.status === 'pending') && '⏳ Pending Review'}
+              </div>
+            )}
+
             {answer.isAccepted && (
               <div className="accepted-badge">
                 <FaCheck /> Accepted Answer

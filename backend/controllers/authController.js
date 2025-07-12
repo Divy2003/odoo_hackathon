@@ -9,11 +9,16 @@ exports.signup = async (req, res) => {
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Auto-assign admin role for specific emails
+    const adminEmails = ['admin@stackit.com', 'admin@localhost', 'admin@example.com'];
+    const userRole = adminEmails.includes(email.toLowerCase()) ? 'admin' : (role || 'user');
+
     const newUser = new User({
       name,
       email,
       password: hashedPassword,
-      role,
+      role: userRole,
       lastLogin: new Date()
     });
     await newUser.save();

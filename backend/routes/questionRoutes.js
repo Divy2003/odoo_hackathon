@@ -5,14 +5,15 @@ const {
   getQuestionById,
   createQuestion,
   updateQuestion,
-  deleteQuestion
+  deleteQuestion,
+  incrementView
 } = require('../controllers/questionController');
 const { auth, requireAdmin } = require('../middlewares/auth');
 
 // Public routes
 router.get('/', getQuestions);
 router.get('/:id', getQuestionById);
-router.post('/:id/view', require('../controllers/questionController').incrementQuestionView);
+router.post('/:id/view', incrementView); // Increment view count
 
 // Protected routes (require authentication)
 router.post('/', auth, createQuestion);
