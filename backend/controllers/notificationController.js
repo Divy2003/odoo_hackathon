@@ -3,6 +3,8 @@ const User = require('../models/User');
 
 // Get user's notifications
 exports.getNotifications = async (req, res) => {
+  console.log('DEBUG: req.user =', req.user);
+
   try {
     const { page = 1, limit = 20, unreadOnly = false } = req.query;
 

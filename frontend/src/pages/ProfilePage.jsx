@@ -4,6 +4,9 @@ import { Link } from 'react-router-dom';
 import { getProfile } from '../redux/slices/authSlice';
 import { questionsAPI, answersAPI, votesAPI } from '../services/api';
 import { FaUser, FaQuestion, FaComment, FaThumbsUp, FaCalendar, FaEdit } from 'react-icons/fa';
+import Avatar from '../components/common/Avatar';
+import EditQuestion from '../components/questions/EditQuestion';
+import EditAnswer from '../components/questions/EditAnswer';
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -17,40 +20,50 @@ const Profile = () => {
     recentAnswers: []
   });
   const [statsLoading, setStatsLoading] = useState(true);
+  const [editingQuestion, setEditingQuestion] = useState(null);
+  const [editingAnswer, setEditingAnswer] = useState(null);
 
   useEffect(() => {
     dispatch(getProfile());
   }, [dispatch]);
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id || user?._id) {
       fetchUserStats();
     }
-  }, [user?.id]);
+  }, [user?.id, user?._id]);
 
   const fetchUserStats = async () => {
-    if (!user?.id) return;
-    
+    const userId = user?._id || user?.id;
+    if (!userId) {
+      console.log("No user ID found:", user);
+      return;
+    }
+
     setStatsLoading(true);
     try {
+      console.log("Fetching stats for user:", userId);
       // Fetch user's questions
       const questionsResponse = await questionsAPI.getQuestions({
-        author: user._id,
+        author: userId,
         limit: 5
       });
       console.log("questionsResponse-",questionsResponse);
       
+      // Fetch user's answers
+      const answersResponse = await answersAPI.getUserAnswers({ limit: 5 });
+      console.log("answersResponse-", answersResponse);
+
       // Fetch user's votes
       const votesResponse = await votesAPI.getUserVotes({ limit: 5 });
       console.log("votesResponse-",votesResponse);
-      
+
       setUserStats({
         questionsCount: questionsResponse.data.pagination.totalQuestions,
         recentQuestions: questionsResponse.data.questions,
+        answersCount: answersResponse.data.pagination.totalAnswers,
+        recentAnswers: answersResponse.data.answers,
         votesCount: votesResponse.data.pagination.totalVotes,
-        // Note: We'd need to implement user answers endpoint
-        answersCount: 0,
-        recentAnswers: []
       });
     } catch (error) {
       console.error('Error fetching user stats:', error);
@@ -225,11 +238,20 @@ const Profile = () => {
                       </div>
                     </div>
                     <div className="question-content">
-                      <h4>
-                        <a href={`/questions/${question._id}`}>
-                          {question.title}
-                        </a>
-                      </h4>
+                      <div className="question-header">
+                        <h4>
+                          <a href={`/questions/${question._id}`}>
+                            {question.title}
+                          </a>
+                        </h4>
+                        <button
+                          className="btn btn-sm btn-outline"
+                          onClick={() => setEditingQuestion(question)}
+                          title="Edit Question"
+                        >
+                          <FaEdit />
+                        </button>
+                      </div>
                       <div className="question-tags">
                         {question.tags?.map((tag) => (
                           <span key={tag._id} className="tag" style={{ backgroundColor: tag.color }}>
@@ -255,9 +277,46 @@ const Profile = () => {
         {activeTab === 'answers' && (
           <div className="answers-tab">
             <h3>All Answers ({userStats.answersCount})</h3>
-            <div className="no-content">
-              <p>No answers yet.</p>
-            </div>
+            {statsLoading ? (
+              <div className="loading">Loading answers...</div>
+            ) : userStats.recentAnswers.length > 0 ? (
+              <div className="answers-list">
+                {userStats.recentAnswers.map((answer) => (
+                  <div key={answer._id} className="answer-item">
+                    <div className="answer-content">
+                      <div className="answer-header">
+                        <h4>
+                          <a href={`/questions/${answer.question._id}`}>
+                            Answer to: {answer.question.title}
+                          </a>
+                        </h4>
+                        <button
+                          className="btn btn-sm btn-outline"
+                          onClick={() => setEditingAnswer(answer)}
+                          title="Edit Answer"
+                        >
+                          <FaEdit />
+                        </button>
+                      </div>
+                      <div className="answer-preview">
+                        {answer.content.length > 200
+                          ? `${answer.content.substring(0, 200)}...`
+                          : answer.content}
+                      </div>
+                      <div className="answer-meta">
+                        <span>{answer.votes} votes</span>
+                        <span>{formatDate(answer.createdAt)}</span>
+                        {answer.isAccepted && <span className="accepted">✓ Accepted</span>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-content">
+                <p>No answers yet.</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -270,6 +329,42 @@ const Profile = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Modals */}
+      {editingQuestion && (
+        <EditQuestion
+          questionId={editingQuestion._id}
+          onClose={() => setEditingQuestion(null)}
+          onUpdate={(updatedQuestion) => {
+            // Update the question in the local state
+            setUserStats(prev => ({
+              ...prev,
+              recentQuestions: prev.recentQuestions.map(q =>
+                q._id === updatedQuestion._id ? updatedQuestion : q
+              )
+            }));
+            setEditingQuestion(null);
+          }}
+        />
+      )}
+
+      {editingAnswer && (
+        <EditAnswer
+          answerId={editingAnswer._id}
+          initialContent={editingAnswer.content}
+          onClose={() => setEditingAnswer(null)}
+          onUpdate={(updatedAnswer) => {
+            // Update the answer in the local state
+            setUserStats(prev => ({
+              ...prev,
+              recentAnswers: prev.recentAnswers.map(a =>
+                a._id === updatedAnswer._id ? updatedAnswer : a
+              )
+            }));
+            setEditingAnswer(null);
+          }}
+        />
+      )}
     </div>
   );
 };

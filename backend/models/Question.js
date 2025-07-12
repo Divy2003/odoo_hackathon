@@ -71,12 +71,14 @@ questionSchema.index({ views: -1 });
 
 // Virtual for answer count
 questionSchema.virtual('answerCount').get(function() {
-  return this.answers.length;
+  return this.answers ? this.answers.length : 0;
 });
 
 // Virtual for vote score
 questionSchema.virtual('voteScore').get(function() {
-  return this.upvotes.length - this.downvotes.length;
+  const upvotes = this.upvotes ? this.upvotes.length : 0;
+  const downvotes = this.downvotes ? this.downvotes.length : 0;
+  return upvotes - downvotes;
 });
 
 // Ensure virtual fields are serialized

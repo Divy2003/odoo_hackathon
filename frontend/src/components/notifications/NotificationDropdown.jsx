@@ -15,10 +15,11 @@ const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { isAuthenticated } = useSelector((state) => state.auth);
-  const { notifications, unreadCount, loading } = useSelector((state) => state.notifications);
+  const { notifications, unreadCount, loading, error } = useSelector((state) => state.notifications);
 
   useEffect(() => {
     if (isAuthenticated) {
+      console.log("Fetching unread count for authenticated user");
       dispatch(fetchUnreadCount());
       // Set up polling for new notifications
       const interval = setInterval(() => {
@@ -41,6 +42,7 @@ const NotificationDropdown = () => {
 
   const handleToggleDropdown = () => {
     if (!isOpen) {
+      console.log("Fetching notifications...");
       dispatch(fetchNotifications({ limit: 10 }));
     }
     setIsOpen(!isOpen);
@@ -107,9 +109,12 @@ const NotificationDropdown = () => {
           </div>
 
           <div className="notification-list">
+            {error && (
+              <div className="notification-error">{error}</div>
+            )}
             {loading ? (
               <div className="notification-loading">Loading...</div>
-            ) : notifications.length === 0 ? (
+            ) : notifications.length === 0 && !error ? (
               <div className="no-notifications">
                 <p>No notifications yet</p>
               </div>

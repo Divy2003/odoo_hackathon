@@ -286,3 +286,40 @@ exports.unacceptAnswer = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// Get answers by user (for profile)
+exports.getUserAnswers = async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const answers = await Answer.find({
+      author: req.user.id,
+      isActive: true
+    })
+      .populate('author', 'name email reputation avatar')
+      .populate('question', 'title')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Answer.countDocuments({
+      author: req.user.id,
+      isActive: true
+    });
+
+    res.json({
+      answers,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(total / limit),
+        totalAnswers: total,
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Get user answers error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

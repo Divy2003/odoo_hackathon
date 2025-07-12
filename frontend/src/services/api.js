@@ -61,6 +61,7 @@ export const answersAPI = {
   updateAnswer: (id, data) => api.put(`/answers/${id}`, data),
   deleteAnswer: (id) => api.delete(`/answers/${id}`),
   acceptAnswer: (id) => api.patch(`/answers/${id}/accept`),
+  getUserAnswers: (params) => api.get('/answers/user/me', { params }),
 };
 
 // Votes API
